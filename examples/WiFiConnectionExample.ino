@@ -1,32 +1,19 @@
-#include <WiFi.h>
-
-const char *ssid = "Rede";
-const char *password = "rede_password";
+#include "wifi.h"
 
 void setup()
 {
     Serial.begin(115200);
-    WiFi.begin(ssid, password);
-    Serial.print("Connecting to WiFi...");
 
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        delay(500);
-        Serial.print(".");
-    }
-
-    Serial.println("\nConnected to WiFi !!!");
-    Serial.println("IP adress: ");
-    Serial.print(WiFi.localIP());
+    wifi_connect("Rede", "rede_password");
 }
 
 void loop()
 {
     if (WiFi.status() == WL_CONNECTED)
     {
-        Serial.println("\nPing me: ");
+        Serial.print("\nI'm Still connected, my IP address is: ");
         Serial.println(WiFi.localIP());
-        delay(15000);
+        delay(10000);
     }
     else
     {
