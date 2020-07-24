@@ -1,6 +1,6 @@
 #include <WiFi.h>
 
-void wifi_connect(char* ssid, char* password)
+void wifi_connect(char *ssid, char *password)
 {
     WiFi.begin(ssid, password);
 

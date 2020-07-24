@@ -6,7 +6,6 @@ const char *password = "rede_password";
 void setup()
 {
     Serial.begin(115200);
-
     WiFi.begin(ssid, password);
     Serial.print("Connecting to WiFi...");
 
@@ -16,8 +15,8 @@ void setup()
         Serial.print(".");
     }
 
-    Serial.println("\nConnected to WiFi !!!\n");
-    Serial.print("IP address: ");
+    Serial.println("\nConnected to WiFi !!!");
+    Serial.println("IP adress: ");
     Serial.print(WiFi.localIP());
 }
 
