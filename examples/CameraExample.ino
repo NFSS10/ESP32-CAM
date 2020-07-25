@@ -35,7 +35,7 @@ void sendPhotoToServer()
         return;
     }
 
-    String postResponseBody = http_post_jpg("192.168.1.68", "/fileUpload", fb->buf, fb->len);
+    String postResponseBody = http_post_jpg("192.168.1.68", 3000, "/fileUpload", fb->buf, fb->len);
     freeCameraResources(fb);
 
     Serial.println("Body: " + postResponseBody);
