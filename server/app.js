@@ -27,15 +27,12 @@ fastify.post('/fileUpload', async (req, reply) => {
     })
 
     function onEnd(err) {
-        console.log('upload completed')
-        reply.code(200).send()
+        reply.code(200).send({ file: "uploaded successfully" })
     }
 
     function handler(field, file, filename, encoding, mimetype) {
         pump(file, fs.createWriteStream('uploadedFile'))
     }
-
-    return { file: "uploaded successfully" };
 })
 
 // Start server
