@@ -5,6 +5,10 @@ fastify.get('/', async (request, reply) => {
     return { hello: 'world' }
 })
 
+fastify.post('/', async (request, reply) => {
+    return { test: 'POST to server !' }
+})
+
 // Start server
 const start = async () => {
     try {
