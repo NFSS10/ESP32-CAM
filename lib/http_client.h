@@ -1,4 +1,5 @@
 #include <HTTPClient.h>
+#include <WiFi.h>
 
 typedef struct
 {
@@ -36,4 +37,83 @@ response http_post(String url, String payload)
     client.end();
 
     return res;
+}
+
+String http_post_jpg(String host, short port, String endpoint, uint8_t *fileBuf, size_t fileBufLength, String filename)
+{
+    WiFiClient client;
+
+    String responseAllStr;
+    String bodyStr;
+
+    if (client.connect(host.c_str(), port))
+    {
+        String head = "--BOUNDARY\r\nContent-Disposition: form-data; name=\"imageFile\"; filename=\"" + filename + "\"\r\nContent-Type: image/jpeg\r\n\r\n";
+        String tail = "\r\n--BOUNDARY--\r\n";
+
+        size_t totalLength = fileBufLength + head.length() + tail.length();
+
+        client.println("POST " + endpoint + " HTTP/1.1");
+        client.println("Host: " + host);
+        client.println("Content-Length: " + String(totalLength));
+        client.println("Content-Type: multipart/form-data; boundary=BOUNDARY");
+        client.println();
+        client.print(head);
+
+        for (size_t n = 0; n < fileBufLength; n = n + 1024)
+        {
+            if (n + 1024 < fileBufLength)
+            {
+                client.write(fileBuf, 1024);
+                fileBuf += 1024;
+            }
+            else if (fileBufLength % 1024 > 0)
+            {
+                size_t remainder = fileBufLength % 1024;
+                client.write(fileBuf, remainder);
+            }
+        }
+        client.print(tail);
+
+        int timoutLimitMS = 10000;
+        long startTimerMS = millis();
+        boolean state = false;
+
+        while ((startTimerMS + timoutLimitMS) > millis())
+        {
+            while (client.available())
+            {
+                char c = client.read();
+                if (c == '\n')
+                {
+                    if (responseAllStr.length() == 0)
+                    {
+                        state = true;
+                    }
+                    responseAllStr = "";
+                }
+                else if (c != '\r')
+                {
+                    responseAllStr += String(c);
+                }
+                if (state == true)
+                {
+                    bodyStr += String(c);
+                }
+                startTimerMS = millis();
+            }
+            if (bodyStr.length() > 0)
+            {
+                break;
+            }
+        }
+
+        client.stop();
+    }
+    else
+    {
+        bodyStr = "Connection to " + host + " failed";
+    }
+
+    return bodyStr;
 }
