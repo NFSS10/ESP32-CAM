@@ -31,7 +31,7 @@ fastify.post('/fileUpload', async (req, reply) => {
     }
 
     function handler(field, file, filename, encoding, mimetype) {
-        pump(file, fs.createWriteStream('uploadedFile'))
+        pump(file, fs.createWriteStream(filename))
     }
 })
 
