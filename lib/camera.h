@@ -74,3 +74,8 @@ camera_fb_t *takePhoto()
 {
     return esp_camera_fb_get();
 }
+
+void freeCameraResources(camera_fb_t *fb)
+{
+    esp_camera_fb_return(fb);
+}
