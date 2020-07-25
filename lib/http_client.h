@@ -20,3 +20,20 @@ response http_get(String url)
 
     return res;
 }
+
+response http_post(String url, String payload)
+{
+    response res;
+
+    HTTPClient client;
+    client.begin(url);
+
+    client.addHeader("Content-Type", "text/plain");
+
+    res.status_code = client.POST(payload);
+    res.body = client.getString();
+
+    client.end();
+
+    return res;
+}
