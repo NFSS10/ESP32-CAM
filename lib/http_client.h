@@ -43,8 +43,8 @@ String http_post_jpg(String host, short port, String endpoint, uint8_t *fileBuf,
 {
     WiFiClient client;
 
-    String responseAllStr;
-    String bodyStr;
+    String responseStr = "";
+    String bodyStr = "";
 
     if (client.connect(host.c_str(), port))
     {
@@ -75,36 +75,18 @@ String http_post_jpg(String host, short port, String endpoint, uint8_t *fileBuf,
         }
         client.print(tail);
 
-        int timoutLimitMS = 10000;
+        int responseTimeoutMS = 5000;
         long startTimerMS = millis();
-        boolean state = false;
 
-        while ((startTimerMS + timoutLimitMS) > millis())
+        bool isBody = false;
+        while (millis() < (startTimerMS + responseTimeoutMS))
         {
             while (client.available())
             {
-                char c = client.read();
-                if (c == '\n')
-                {
-                    if (responseAllStr.length() == 0)
-                    {
-                        state = true;
-                    }
-                    responseAllStr = "";
-                }
-                else if (c != '\r')
-                {
-                    responseAllStr += String(c);
-                }
-                if (state == true)
-                {
-                    bodyStr += String(c);
-                }
-                startTimerMS = millis();
-            }
-            if (bodyStr.length() > 0)
-            {
-                break;
+                String line = String(client.readStringUntil('\r'));
+
+                isBody ? (bodyStr += line) : (responseStr += line);
+                !isBody && (isBody = line == "\n");
             }
         }
 
