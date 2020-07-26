@@ -39,13 +39,15 @@ response http_post(String url, String payload)
     return res;
 }
 
-String http_post_jpg(String host, short port, String endpoint, uint8_t *fileBuf, size_t fileBufLength, String filename)
+response http_post_jpg(String host, short port, String endpoint, uint8_t *fileBuf, size_t fileBufLength, String filename)
 {
-    WiFiClient client;
+    response res;
 
     String responseStr = "";
     String bodyStr = "";
+    WiFiClient client;
 
+    //Handle file POST request
     if (client.connect(host.c_str(), port))
     {
         String head = "--BOUNDARY\r\nContent-Disposition: form-data; name=\"imageFile\"; filename=\"" + filename + "\"\r\nContent-Type: image/jpeg\r\n\r\n";
@@ -75,10 +77,11 @@ String http_post_jpg(String host, short port, String endpoint, uint8_t *fileBuf,
         }
         client.print(tail);
 
+        //Handle POST response
         int responseTimeoutMS = 5000;
         long startTimerMS = millis();
-
         bool isBody = false;
+
         while (millis() < (startTimerMS + responseTimeoutMS))
         {
             while (client.available())
@@ -94,8 +97,30 @@ String http_post_jpg(String host, short port, String endpoint, uint8_t *fileBuf,
     }
     else
     {
-        bodyStr = "Connection to " + host + " failed";
+        res.status_code = -1;
+        res.body = "Connection to " + host + " failed";
+
+        return res;
     }
 
-    return bodyStr;
+    //Parse reponse status codeF
+    bool isStatusCode = false;
+    String statusCodeStr = "";
+    for (short i = 0; i < responseStr.length(); i++)
+    {
+        isStatusCode && (statusCodeStr += responseStr[i]);
+
+        if (isSpace(responseStr.charAt(i)))
+        {
+            if (isStatusCode)
+                break;
+            else
+                isStatusCode = true;
+        }
+    }
+
+    res.status_code = statusCodeStr.toInt();
+    res.body = bodyStr;
+
+    return res;
 }
