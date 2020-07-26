@@ -35,8 +35,11 @@ void sendPhotoToServer()
         return;
     }
 
-    String postResponseBody = http_post_jpg("192.168.1.68", 3000, "/fileUpload", fb->buf, fb->len, "esp_photo.jpg");
+    response post_res = http_post_jpg("192.168.1.68", 3000, "/fileUpload", fb->buf, fb->len, "esp_photo.jpg");
     freeCameraResources(fb);
 
-    Serial.println("Body: " + postResponseBody);
+    Serial.print("\nStatus code: ");
+    Serial.println(post_res.status_code);
+    Serial.print("Response:");
+    Serial.println(post_res.body);
 }
